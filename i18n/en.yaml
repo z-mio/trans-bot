@@ -1,0 +1,8 @@
+45b3385513d3: Translation not enabled
+467b2a3c8fb4: Language code `{lang}` is invalid
+5a1eeb54f44d: 'Group language changed to: `{lang}`'
+5aad46a0fb38: Translation disabled
+92da3d154102: 'Translation enabled, group language set to: `{lang}`'
+be1b3cef25a9: Failed to automatically retrieve group language, please set the language
+  manually, `/enable <language code>`
+c0b72729b771: Automatically retrieving group language...
