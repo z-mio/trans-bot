@@ -1,4 +1,3 @@
-from config.config import cfg
 from database.db import async_session
 from database.tables.chat import Chat
 from utils.db import DB
@@ -20,7 +19,7 @@ class ChatMgmt:
 
     async def get_lang(self, chat_id: int):
         if chat := await self.get_chat(chat_id):
-            return chat.language_code or cfg.default_lang
+            return chat.language_code
         return False
 
     async def set_lang(self, chat_id: int, lang: str):

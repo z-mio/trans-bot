@@ -2,6 +2,7 @@ from langcodes import Language
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
+from config.config import cfg
 from database.tables import Chat
 from methods.chat_mgmt import ChatMgmt
 from translator import GoogleTranslator, Detecter
@@ -25,7 +26,7 @@ async def trans(_, msg: Message):
 @Client.on_message(filters.command("enable") & filters.group & is_group_admin)
 async def enable_group_trans(cli: Client, msg: Message):
     cm = ChatMgmt()
-    _t = t_[await cm.get_lang(msg.chat.id)]
+    _t = t_[(await cm.get_lang(msg.chat.id)) or cfg.default_lang]
     if msg.command[1:]:
         lang = msg.command[1]
         if not Language.get(lang).is_valid():

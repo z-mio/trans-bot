@@ -7,7 +7,7 @@ t_ = i18n.i18n()
 
 if __name__ == "__main__":
     i18n.build(
-        ["en", "ja", "zh-hant", "ru"],
+        ["en", "ja", "zh-hant", "ru", "zh-hans"],
         translator=OpenAIBulkTranslator(),
         include=["plugins"],
     )
