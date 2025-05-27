@@ -5,9 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiosqlite>=0.21.0",
+    "easy-ai18n>=1.0.2",
+    "googletrans>=4.0.2",
     "kurigram>=2.2.3",
+    "langcodes>=3.5.0",
     "loguru>=0.7.3",
+    "openai>=1.82.0",
     "python-dotenv>=1.1.0",
     "pyyaml>=6.0.2",
+    "sqlalchemy>=2.0.41",
+    "tenacity>=9.1.2",
     "tgcrypto>=1.2.5",
 ]

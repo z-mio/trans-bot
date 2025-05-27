@@ -2,6 +2,7 @@ import sys
 
 from pyrogram import Client
 from config.config import cfg
+from database.db import init_db
 from log import logger
 from utils.optimized_event_loop import setup_optimized_event_loop
 
@@ -28,6 +29,7 @@ class Bot(Client):
         )
 
     async def start(self, **kwargs):
+        await init_db()
         logger.info("Bot开始运行...")
         await super().start()
 
