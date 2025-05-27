@@ -48,6 +48,7 @@ async def enable_group_trans(cli: Client, msg: Message):
         )
     )
     if not chat:
+        await cm.set_trans_status(msg.chat.id, True)
         await cm.set_lang(msg.chat.id, lang)
         return await msg.reply(_t(f"已修改群组语言为: `{lang}`"))
     return await msg.reply(_t(f"已启用翻译, 群组语言设置为: `{lang}`"))
