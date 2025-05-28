@@ -16,6 +16,8 @@ class BotConfig:
         self.proxy: None | BotConfig._Proxy = self._Proxy(getenv("PROXY", None))
         self.debug = getenv("BOT_DEBUG", "False").lower() == "true"
         self.default_lang = getenv("DEFAULT_LANG", "zh-hans")
+        self.trans_provider = getenv("TRANS_PROVIDER", "google")
+        self.trans_model = getenv("TRANS_MODEL", "gpt-4o-mini")
 
     class _Proxy:
         def __init__(self, url: str):

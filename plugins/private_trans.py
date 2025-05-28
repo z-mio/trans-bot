@@ -1,6 +1,8 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from translator import OpenAITranslator, Detecter
+
+from methods import Trans
+from translator import Detecter
 
 
 @Client.on_message(filters.private & filters.text)
@@ -10,5 +12,5 @@ async def trans(_, msg: Message):
     from_lang = (await Detecter().detect(text)).lower()
     if from_lang == to_lang:
         return None
-    translated = await OpenAITranslator().translate(text, "en")
+    translated = await Trans().translate(text, "en")
     return await msg.reply(translated)
