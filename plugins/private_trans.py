@@ -14,3 +14,6 @@ async def trans(_, msg: Message):
         return None
     translated = await Trans().translate(text, "en")
     return await msg.reply(translated)
+
+
+# TODO: 私聊翻译功能

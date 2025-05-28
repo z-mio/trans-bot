@@ -11,3 +11,17 @@ Telegram Translation Bot, can be added to groups, automatically translating othe
 | `TRANS_MODEL`     | `gpt-4o-mini` | openai使用的模型                   |
 | `OPENAI_API_KEY`  |               | openai API_KEY                |
 | `OPENAI_BASE_URL` |               | openai API_URL                |
+
+## 运行
+
+```bash
+uv sync
+uv run bot.py
+```
+
+## 指令
+
+群聊中发送
+
+- `/enable` - 启用自动翻译
+- `/disable` - 禁用自动翻译
