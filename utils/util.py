@@ -94,3 +94,24 @@ def is_symbols_only(text):
             return False
 
     return True
+
+
+def is_only_mentions(text):
+    """
+    判断文本是否只包含@用户名
+
+    Args:
+        text (str): 要检查的文本
+
+    Returns:
+        bool: 如果文本只包含@用户名，返回 True；否则返回 False
+    """
+    text = text.strip()
+    if not text:
+        return False
+
+    # Telegram 用户名规则：5-32个字符，只能包含字母、数字和下划线
+    # 检查整个文本是否只由@username模式组成
+    pattern = re.compile(r'^(@[a-zA-Z0-9_]{1,32})(\s+@[a-zA-Z0-9_]{5,32})*$')
+
+    return bool(pattern.match(text))

@@ -6,7 +6,7 @@ from log import logger
 from methods.chat_mgmt import ChatMgmt
 from pyrogram.enums import ChatType, ChatMemberStatus
 
-from utils.util import is_emoji_only, is_only_url, is_symbols_only
+from utils.util import is_emoji_only, is_only_url, is_symbols_only, is_only_mentions
 
 
 async def _is_admin(_, __, msg: Message):
@@ -74,6 +74,9 @@ async def _trans_filter(_, __, msg: Message):
         return False
     if is_symbols_only(t):
         logger.debug("是符号, 跳过")
+        return False
+    if is_only_mentions(t):
+        logger.debug("是@, 跳过")
         return False
     return True
 
