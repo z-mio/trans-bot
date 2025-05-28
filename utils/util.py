@@ -1,11 +1,11 @@
-from collections import Counter
-
+import emoji
 import unicodedata
+import re
+
+from collections import Counter
 from pyrogram import Client
 from pyrogram.types import Message
-
 from translator import Detecter
-import re
 
 
 async def get_group_lang(cli: Client, msg: Message) -> str | None:
@@ -20,28 +20,22 @@ async def get_group_lang(cli: Client, msg: Message) -> str | None:
 
 
 def is_emoji_only(text: str) -> bool:
-    """检查文本是否只包含emoji"""
+    """
+    使用emoji库检查文本是否只包含emoji
 
-    # emoji正则表达式模式
-    emoji_pattern = re.compile(
-        "["
-        "\U0001f600-\U0001f64f"  # 表情符号
-        "\U0001f300-\U0001f5ff"  # 符号和象形文字
-        "\U0001f680-\U0001f6ff"  # 交通和地图符号
-        "\U0001f700-\U0001f77f"  # 闹钟符号
-        "\U0001f780-\U0001f7ff"  # 几何符号
-        "\U0001f800-\U0001f8ff"  # 箭头符号
-        "\U0001f900-\U0001f9ff"  # 补充符号和象形文字
-        "\U0001fa00-\U0001fa6f"  # 棋盘符号
-        "\U0001fa70-\U0001faff"  # 符号和象形文字扩展
-        "\U00002702-\U000027b0"  # 杂项符号
-        "\U000024c2-\U0001f251"
-        "]+",
-        flags=re.UNICODE,
-    )
+    Args:
+        text (str): 要检查的文本
 
-    # 移除所有emoji
-    text_without_emoji = emoji_pattern.sub(r"", text)
+    Returns:
+        bool: 如果文本只包含emoji，返回True；否则返回False
+    """
+
+    text = text.strip()
+    if not text:
+        return False
+
+    # 移除所有可能的emoji
+    text_without_emoji = emoji.replace_emoji(text, "")
     # 移除空白字符
     text_without_emoji = text_without_emoji.strip()
 
@@ -110,8 +104,6 @@ def is_only_mentions(text):
     if not text:
         return False
 
-    # Telegram 用户名规则：5-32个字符，只能包含字母、数字和下划线
-    # 检查整个文本是否只由@username模式组成
-    pattern = re.compile(r'^(@[a-zA-Z0-9_]{1,32})(\s+@[a-zA-Z0-9_]{5,32})*$')
+    pattern = re.compile(r"^(@[a-zA-Z0-9_]{1,32})(\s+@[a-zA-Z0-9_]{5,32})*$")
 
     return bool(pattern.match(text))

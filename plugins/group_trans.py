@@ -5,7 +5,7 @@ from pyrogram.types import Message
 from database.tables import Chat
 from log import logger
 from methods.chat_mgmt import ChatMgmt
-from translator import GoogleTranslator, Detecter
+from translator import OpenAITranslator, Detecter
 from i18n import t_
 from translator.detecter import LangMap
 from utils.filters import is_group_admin, is_enable_trans, trans_filter
@@ -104,7 +104,7 @@ async def trans_group(_, msg: Message):
 
     # 执行翻译
     logger.debug(f"翻译目标语言: {target_lang}")
-    translated = await GoogleTranslator().translate(
+    translated = await OpenAITranslator().translate(
         msg.text, LangMap.get_reverse(target_lang)
     )
     return await msg.reply(translated)
