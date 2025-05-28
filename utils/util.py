@@ -1,5 +1,6 @@
 from collections import Counter
 
+import unicodedata
 from pyrogram import Client
 from pyrogram.types import Message
 
@@ -55,7 +56,7 @@ URL_PATTERN = re.compile(
     r"(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|"  # 域名
     r"localhost|"  # localhost
     r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|"  # IP地址
-    r"\[?[A-F0-9]*:[A-F0-9:]+\]?)"  # IPv6
+    r"\[?[A-F0-9]*:[A-F0-9:]+]?)"  # IPv6
     r"(?::\d+)?"  # 可选的端口
     r"(?:/?|[/?]\S+)$",
     re.IGNORECASE,
@@ -65,3 +66,31 @@ URL_PATTERN = re.compile(
 def is_only_url(text):
     text = text.strip()
     return bool(URL_PATTERN.fullmatch(text))
+
+
+def is_symbols_only(text):
+    """
+    判断文本是否只包含符号（标点符号、特殊字符等）
+
+    Args:
+        text (str): 要检查的文本
+
+    Returns:
+        bool: 如果文本只包含符号，返回 True；否则返回 False
+    """
+    text = text.strip()
+    if not text:
+        return False
+
+    # 使用 Unicode 类别判断
+    for char in text:
+        category = unicodedata.category(char)
+        # 如果不是标点符号 (P)、符号 (S) 或空白 (Z)，则不是纯符号
+        if not (
+            category.startswith("P")
+            or category.startswith("S")
+            or category.startswith("Z")
+        ):
+            return False
+
+    return True
