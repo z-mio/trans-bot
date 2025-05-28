@@ -203,7 +203,7 @@ wheels = [
 
 [[package]]
 name = "easy-ai18n"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "googletrans" },
@@ -215,9 +215,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c1/90/57e7632872397d2e8ac84d1fa95f373c4b2e4e5ea2ae446bed184303f60d/easy_ai18n-1.0.2.tar.gz", hash = "sha256:652efbcd1d5569f0aa44647bedf72ed1941891c03042222df1d9aed50c3078a8", size = 19190, upload-time = "2025-05-27T09:13:17.288Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/de/7d/3272c79b6619fcbf8114a57263e9dd2efba1847b99e14841e45b5acde15f/easy_ai18n-1.0.3.tar.gz", hash = "sha256:8fb460c1fc96a13fde63fe8d2e49e33399f686fb0ee8d47a54df2d68de843b0b", size = 19220, upload-time = "2025-05-28T03:26:55.208Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/03/89/a31400ea20cff73150b3a61943816ebd526fd79c9e7a107a915d37416cab/easy_ai18n-1.0.2-py3-none-any.whl", hash = "sha256:7e6f7fda8926351fbe1ea37653af44ff2ad5794750be2ef359879709e632a270", size = 19245, upload-time = "2025-05-27T09:13:15.368Z" },
+    { url = "https://files.pythonhosted.org/packages/2d/07/653f2258feca78807380c1d7f02ceb247e723aaf6ac539d5742132c4c11f/easy_ai18n-1.0.3-py3-none-any.whl", hash = "sha256:4cfa7d7ea3730328e1338cb875d1ad2280fb4781c2aec8a3ff525dda4c22018b", size = 19320, upload-time = "2025-05-28T03:26:53.589Z" },
 ]
 
 [[package]]

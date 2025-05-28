@@ -2,10 +2,11 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 from config.config import cfg
 from database.tables import Chat
+from log import logger
 from methods.chat_mgmt import ChatMgmt
 from pyrogram.enums import ChatType, ChatMemberStatus
 
-from translator import Detecter
+from utils.util import is_emoji_only, is_only_url
 
 
 async def _is_admin(_, __, msg: Message):
@@ -52,3 +53,25 @@ async def _is_enable_trans(_, __, msg: Message):
 
 
 is_enable_trans = filters.create(_is_enable_trans)
+
+
+async def _trans_filter(_, __, msg: Message):
+    t = msg.text
+    logger.debug(f"检测消息: {t}")
+    if not t:
+        return False
+    if t.startswith("/"):
+        logger.debug("是命令, 跳过")
+        return False
+    if t.isdigit():
+        logger.debug("是数字, 跳过")
+        return False
+    if is_emoji_only(t):
+        logger.debug("是emoji, 跳过")
+        return False
+    if is_only_url(t):
+        logger.debug("是链接, 跳过")
+        return False
+    return True
+
+trans_filter = filters.create(_trans_filter)

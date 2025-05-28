@@ -2,31 +2,20 @@ from langcodes import Language
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from config.config import cfg
 from database.tables import Chat
+from log import logger
 from methods.chat_mgmt import ChatMgmt
 from translator import GoogleTranslator, Detecter
 from i18n import t_
 from translator.detecter import LangMap
-from utils.filters import is_group_admin, is_enable_trans
+from utils.filters import is_group_admin, is_enable_trans, trans_filter
 from utils.util import get_group_lang
 
 
-@Client.on_message(filters.text & filters.private)
-async def trans(_, msg: Message):
-    to_lang = msg.from_user.language_code
-    text = msg.text
-    from_lang = (await Detecter().detect(text)).lower()
-    if from_lang == to_lang:
-        return None
-    translated = await GoogleTranslator().translate(text, "en")
-    return await msg.reply(translated)
-
-
-@Client.on_message(filters.command("enable") & filters.group & is_group_admin)
+@Client.on_message(filters.group & filters.command("enable") & is_group_admin)
 async def enable_group_trans(cli: Client, msg: Message):
     cm = ChatMgmt()
-    _t = t_[(await cm.get_lang(msg.chat.id)) or cfg.default_lang]
+    _t = t_[await cm.get_lang(msg.chat.id)]
     if msg.command[1:]:
         lang = msg.command[1]
         if not Language.get(lang).is_valid():
@@ -38,6 +27,7 @@ async def enable_group_trans(cli: Client, msg: Message):
             return await msg.reply(
                 _t("自动获取群组语言失败, 请手动设置语言, `/enable <语言代码>`")
             )
+    lang = lang.lower()
     chat = await cm.add_chat(
         Chat(
             id=msg.chat.id,
@@ -54,7 +44,7 @@ async def enable_group_trans(cli: Client, msg: Message):
     return await msg.reply(_t(f"已启用翻译, 群组语言设置为: `{lang}`"))
 
 
-@Client.on_message(filters.command("disable") & filters.group & is_group_admin)
+@Client.on_message(filters.group & filters.command("disable") & is_group_admin)
 async def disable_group_trans(_, msg: Message):
     cm = ChatMgmt()
     _t = t_[await cm.get_lang(msg.chat.id)]
@@ -64,7 +54,9 @@ async def disable_group_trans(_, msg: Message):
     return await msg.reply(_t("翻译未启用"))
 
 
-@Client.on_message(filters.text & filters.group & is_enable_trans)
+@Client.on_message(
+    filters.group & filters.text & ~filters.via_bot & trans_filter & is_enable_trans
+)
 async def trans_group(_, msg: Message):
     if not msg.text:
         return None
@@ -72,10 +64,12 @@ async def trans_group(_, msg: Message):
     cm = ChatMgmt()
     group_lang = await cm.get_lang(msg.chat.id)
     user_lang = msg.from_user.language_code
-
+    logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {msg.text}")
     # 如果用户语言与群组语言相同，可能不需要翻译
     if user_lang == group_lang:
         # 但是我们仍然需要检测消息语言，以处理用户使用非母语的情况
+        if msg.text.isdigit():
+            return None
         msg_lang = (await Detecter().detect(msg.text)).lower()
         # 如果用户使用的是群组语言（即他的母语），则不翻译
         if msg_lang == group_lang:
@@ -109,6 +103,7 @@ async def trans_group(_, msg: Message):
         return None
 
     # 执行翻译
+    logger.debug(f"翻译目标语言: {target_lang}")
     translated = await GoogleTranslator().translate(
         msg.text, LangMap.get_reverse(target_lang)
     )

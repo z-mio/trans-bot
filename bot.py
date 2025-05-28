@@ -7,6 +7,7 @@ from log import logger
 from utils.optimized_event_loop import setup_optimized_event_loop
 
 logger.remove()
+
 if cfg.debug:
     logger.add(sys.stderr, level="DEBUG")
     logger.debug("Debug模式已启用")

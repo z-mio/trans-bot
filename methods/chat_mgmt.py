@@ -20,7 +20,7 @@ class ChatMgmt:
     async def get_lang(self, chat_id: int):
         if chat := await self.get_chat(chat_id):
             return chat.language_code
-        return False
+        return None
 
     async def set_lang(self, chat_id: int, lang: str):
         if await self.get_chat(chat_id):
