@@ -65,12 +65,12 @@ async def trans_group(_, msg: Message):
     cm = ChatMgmt()
     group_lang = await cm.get_lang(msg.chat.id)
     user_lang = msg.from_user.language_code
-    logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {msg.text}")
-
+    raw_text = msg.text or msg.caption
+    logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
-    if msg.text.isdigit():
+    if raw_text.isdigit():
         return None
-    msg_lang = (await Detecter().detect(msg.text)).lower()
+    msg_lang = (await Detecter().detect(raw_text)).lower()
 
     # 如果用户语言与群组语言相同
     if user_lang == group_lang:
@@ -121,7 +121,7 @@ async def trans_group(_, msg: Message):
 
     # 执行翻译
     logger.debug(f"翻译目标语言: {target_lang}")
-    translated = await Trans().translate(msg.text, LangMap.get_reverse(target_lang))
+    translated = await Trans().translate(raw_text, LangMap.get_reverse(target_lang))
     text = (
         f"<blockquote expandable>{translated}</blockquote>"
         if len(translated) > 60 or translated.count("\n") > 3
