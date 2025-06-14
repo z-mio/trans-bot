@@ -66,22 +66,38 @@ async def trans_group(_, msg: Message):
     group_lang = await cm.get_lang(msg.chat.id)
     user_lang = msg.from_user.language_code
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {msg.text}")
-    # 如果用户语言与群组语言相同，可能不需要翻译
-    if user_lang == group_lang:
-        # 但是我们仍然需要检测消息语言，以处理用户使用非母语的情况
-        if msg.text.isdigit():
-            return None
-        msg_lang = (await Detecter().detect(msg.text)).lower()
-        # 如果用户使用的是群组语言（即他的母语），则不翻译
-        if msg_lang == group_lang:
-            return None
 
-        # 如果用户使用的不是群组语言，虽然他的母语是群组语言，我们仍然需要翻译
-        target_lang = group_lang
+    # 检测消息语言
+    if msg.text.isdigit():
+        return None
+    msg_lang = (await Detecter().detect(msg.text)).lower()
+
+    # 如果用户语言与群组语言相同
+    if user_lang == group_lang:
+        # 如果是回复消息，需要特殊处理
+        if msg.reply_to_message and msg.reply_to_message.text:
+            reply_lang = (await Detecter().detect(msg.reply_to_message.text)).lower()
+
+            # 情况1：用户使用母语回复外语消息 → 翻译为外语
+            if msg_lang == user_lang and reply_lang != user_lang:
+                target_lang = reply_lang
+            # 情况2：用户使用外语回复母语消息 → 翻译为母语
+            elif msg_lang != user_lang and reply_lang == user_lang:
+                target_lang = user_lang
+            # 情况3：用户使用母语回复母语消息 → 不翻译
+            elif msg_lang == user_lang and reply_lang == user_lang:
+                return None
+            # 其他情况：翻译为群组语言
+            else:
+                target_lang = group_lang
+        else:
+            # 非回复消息：如果用户使用的是群组语言（即他的母语），则不翻译
+            if msg_lang == group_lang:
+                return None
+            # 如果用户使用的不是群组语言，虽然他的母语是群组语言，我们仍然需要翻译
+            target_lang = group_lang
     else:
         # 用户母语与群组语言不同的情况
-        msg_lang = (await Detecter().detect(msg.text)).lower()
-
         # 如果是回复消息，需要特殊处理
         if msg.reply_to_message and msg.reply_to_message.text:
             reply_lang = (await Detecter().detect(msg.reply_to_message.text)).lower()
@@ -105,7 +121,10 @@ async def trans_group(_, msg: Message):
 
     # 执行翻译
     logger.debug(f"翻译目标语言: {target_lang}")
-    translated = await Trans().translate(
-        msg.text, LangMap.get_reverse(target_lang)
+    translated = await Trans().translate(msg.text, LangMap.get_reverse(target_lang))
+    text = (
+        f"<blockquote expandable>{translated}</blockquote>"
+        if len(translated) > 60 or translated.count("\n") > 3
+        else translated
     )
-    return await msg.reply(translated)
+    return await msg.reply(text)
