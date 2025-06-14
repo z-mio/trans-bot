@@ -11,7 +11,12 @@ async def start(_, msg: Message):
 
 @Client.on_message(filters.command("menu") & is_admin)
 async def set_menu(cli: Client, msg: Message):
-    commands = {"start": "开始", "help": "帮助"}
+    commands = {
+        "start": "开始",
+        "help": "帮助",
+        "enable": "启用群内翻译",
+        "disable": "禁用群内翻译",
+    }
     await cli.set_bot_commands(
         [BotCommand(command=k, description=v) for k, v in commands.items()]
     )

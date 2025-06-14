@@ -3,9 +3,12 @@ from pyrogram.types import Message
 
 from methods import Trans
 from translator import Detecter
+from utils.filters import trans_filter
 
 
-@Client.on_message(filters.private & filters.text)
+@Client.on_message(
+    filters.private & (filters.text | filters.caption) & ~filters.via_bot & trans_filter
+)
 async def trans(_, msg: Message):
     to_lang = msg.from_user.language_code
     text = msg.text
