@@ -56,7 +56,7 @@ is_enable_trans = filters.create(_is_enable_trans)
 
 
 async def _trans_filter(_, __, msg: Message):
-    t = msg.text
+    t = msg.text or msg.caption
     logger.debug(f"检测消息: {t}")
     if not t:
         return False

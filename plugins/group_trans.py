@@ -56,16 +56,20 @@ async def disable_group_trans(_, msg: Message):
 
 
 @Client.on_message(
-    filters.group & filters.text & ~filters.via_bot & trans_filter & is_enable_trans
+    filters.group
+    & (filters.text | filters.caption)
+    & ~filters.via_bot
+    & trans_filter
+    & is_enable_trans
 )
 async def trans_group(_, msg: Message):
-    if not msg.text:
+    raw_text = msg.text or msg.caption
+    if not raw_text:
         return None
 
     cm = ChatMgmt()
     group_lang = await cm.get_lang(msg.chat.id)
     user_lang = msg.from_user.language_code
-    raw_text = msg.text or msg.caption
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
     if raw_text.isdigit():
