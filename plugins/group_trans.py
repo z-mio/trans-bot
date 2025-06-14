@@ -88,6 +88,8 @@ async def trans_group(_, msg: Message):
         if len(translated) > 60 or translated.count("\n") > 3
         else translated
     )
+    if text == raw_text:
+        return None
     return await msg.reply(text)
 
 
