@@ -72,59 +72,16 @@ async def trans_group(_, msg: Message):
     user_lang = msg.from_user.language_code
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
-    if raw_text.isdigit():
-        return None
     msg_lang = (await Detecter().detect(raw_text)).lower()
 
-    # 如果用户语言与群组语言相同
-    if user_lang == group_lang:
-        # 如果是回复消息，需要特殊处理
-        if msg.reply_to_message and msg.reply_to_message.text:
-            reply_lang = (await Detecter().detect(msg.reply_to_message.text)).lower()
-
-            # 情况1：用户使用母语回复外语消息 → 翻译为外语
-            if msg_lang == user_lang and reply_lang != user_lang:
-                target_lang = reply_lang
-            # 情况2：用户使用外语回复母语消息 → 翻译为母语
-            elif msg_lang != user_lang and reply_lang == user_lang:
-                target_lang = user_lang
-            # 情况3：用户使用母语回复母语消息 → 不翻译
-            elif msg_lang == user_lang and reply_lang == user_lang:
-                return None
-            # 其他情况：翻译为群组语言
-            else:
-                target_lang = group_lang
-        else:
-            # 非回复消息：如果用户使用的是群组语言（即他的母语），则不翻译
-            if msg_lang == group_lang:
-                return None
-            # 如果用户使用的不是群组语言，虽然他的母语是群组语言，我们仍然需要翻译
-            target_lang = group_lang
-    else:
-        # 用户母语与群组语言不同的情况
-        # 如果是回复消息，需要特殊处理
-        if msg.reply_to_message and msg.reply_to_message.text:
-            reply_lang = (await Detecter().detect(msg.reply_to_message.text)).lower()
-
-            # 情况1：用户使用母语回复外语消息 → 翻译为外语
-            if msg_lang == user_lang and reply_lang != user_lang:
-                target_lang = reply_lang
-            # 情况2：用户使用外语回复母语消息 → 翻译为母语
-            elif msg_lang != user_lang and reply_lang == user_lang:
-                target_lang = user_lang
-            # 其他情况：翻译为群组语言
-            else:
-                target_lang = group_lang
-        else:
-            # 非回复消息：翻译为群组语言
-            target_lang = group_lang
-
-    # 如果目标语言与消息语言相同，不翻译
-    if target_lang == msg_lang:
+    # 确定目标翻译语言
+    target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
+    # 如果不需要翻译，直接返回
+    if not target_lang or target_lang == msg_lang:
         return None
 
     # 执行翻译
-    logger.debug(f"翻译目标语言: {target_lang}")
+    logger.debug(f"翻译到目标语言: {target_lang}")
     translated = await Trans().translate(raw_text, LangMap.get_reverse(target_lang))
     text = (
         f"<blockquote expandable>{translated}</blockquote>"
@@ -132,3 +89,68 @@ async def trans_group(_, msg: Message):
         else translated
     )
     return await msg.reply(text)
+
+
+async def _determine_target_language(
+    msg: Message, user_lang: str, group_lang: str, msg_lang: str
+) -> str | None:
+    """
+    确定翻译目标语言
+
+    Args:
+        msg: 消息对象
+        user_lang: 用户语言
+        group_lang: 群组语言
+        msg_lang: 消息语言
+
+    Returns:
+        目标语言代码，如果不需要翻译则返回 None
+    """
+    # 处理回复消息
+    if msg.reply_to_message and msg.reply_to_message.text:
+        raw_text = msg.reply_to_message.text or msg.reply_to_message.caption
+        reply_lang = (await Detecter().detect(raw_text)).lower()
+        return _get_reply_target_language(user_lang, group_lang, msg_lang, reply_lang)
+
+    # 处理非回复消息
+    return _get_normal_target_language(user_lang, group_lang, msg_lang)
+
+
+def _get_reply_target_language(
+    user_lang: str, group_lang: str, msg_lang: str, reply_lang: str
+) -> str | None:
+    """
+    处理回复消息的目标语言逻辑
+    """
+    # 用户使用母语回复外语消息 → 翻译为被回复消息的语言
+    if msg_lang == user_lang and reply_lang != user_lang:
+        return reply_lang
+
+    # 用户使用外语回复母语消息 → 翻译为用户母语
+    if msg_lang != user_lang and reply_lang == user_lang:
+        return user_lang
+
+    # 用户使用母语回复母语消息（且都是群组语言） → 不翻译
+    if msg_lang == user_lang == reply_lang == group_lang:
+        return None
+
+    # 其他情况 → 翻译为群组语言
+    return group_lang
+
+
+def _get_normal_target_language(
+    user_lang: str, group_lang: str, msg_lang: str
+) -> str | None:
+    """
+    处理普通消息的目标语言逻辑
+    """
+    # 用户语言与群组语言相同
+    if user_lang == group_lang:
+        # 如果消息语言也是群组语言，不翻译
+        if msg_lang == group_lang:
+            return None
+        # 如果消息语言不是群组语言，翻译为群组语言
+        return group_lang
+
+    # 用户语言与群组语言不同，翻译为群组语言
+    return group_lang

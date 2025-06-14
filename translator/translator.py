@@ -32,7 +32,7 @@ class OpenAITranslator(BaseTranslator):
         self,
         api_key: str = None,
         base_url: str = None,
-        model: str = "gpt-4o-mini",
+        model: str = "gpt-4.1-nano",
         prompt: str = TRANSLATE_PROMPT,
     ):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
