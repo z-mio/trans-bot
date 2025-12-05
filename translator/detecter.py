@@ -2,6 +2,7 @@ from typing import overload
 
 from googletrans import Translator as Gt
 from langcodes import standardize_tag
+from lingua import LanguageDetectorBuilder
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from translator.error import DetectionError
@@ -17,16 +18,15 @@ class Detecter:
     async def detect(self, text: list[str]) -> list[str]: ...
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(1.5))
-    async def detect(self, text: str | list[str]) -> str | list[str]:
+    async def detect(self, text: str) -> str:
         try:
-            result = await self.gt.detect(text)
+            # result = await self.gt.detect(text)
+            detector = LanguageDetectorBuilder.from_all_languages().build()
+            result = detector.detect_language_of(text)
         except Exception as e:
             raise DetectionError(f"检测语言错误: {e}")
         else:
-            if isinstance(result, list):
-                return [LangMap.get(r.lang) for r in result]
-            else:
-                return LangMap.get(result.lang)
+            return LangMap.get(result.iso_code_639_1.name.lower())
 
 
 class LangMap:

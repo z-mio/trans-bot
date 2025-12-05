@@ -19,6 +19,10 @@ async def get_group_lang(cli: Client, msg: Message) -> str | None:
     return group_lang
 
 
+def to_iso639_1(locale: str):
+    return locale.split("-")[0].split("_")[0].lower()
+
+
 def is_emoji_only(text: str) -> bool:
     """
     使用emoji库检查文本是否只包含emoji

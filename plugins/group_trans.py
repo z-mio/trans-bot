@@ -10,7 +10,7 @@ from translator import Detecter
 from i18n import t_
 from translator.detecter import LangMap
 from utils.filters import is_group_admin, is_enable_trans, trans_filter
-from utils.util import get_group_lang
+from utils.util import get_group_lang, to_iso639_1
 
 
 @Client.on_message(filters.group & filters.command("enable") & is_group_admin)
@@ -26,9 +26,11 @@ async def enable_group_trans(cli: Client, msg: Message):
         lang = await get_group_lang(cli, msg)
         if not lang:
             return await msg.reply(
-                _t("自动获取群组语言失败, 请手动设置语言, `/enable <语言代码>`")
+                _t(
+                    "自动获取群组语言失败, 请手动设置语言, `/enable <ISO 639-1 语言代码>`"
+                )
             )
-    lang = lang.lower()
+    lang = to_iso639_1(lang.lower())
     chat = await cm.add_chat(
         Chat(
             id=msg.chat.id,
@@ -44,7 +46,7 @@ async def enable_group_trans(cli: Client, msg: Message):
         return await msg.reply(_t(f"已修改群组语言为: `{lang}`"))
     return await msg.reply(
         _t(
-            f"已启用翻译, 群组语言设置为: `{lang}`\n如需手动设置语言, 请使用 `/enable <语言代码>`"
+            f"已启用翻译, 群组语言设置为: `{lang}`\n如需手动设置语言, 请使用 `/enable <ISO 639-1 语言代码>`"
         )
     )
 
@@ -73,19 +75,21 @@ async def trans_group(_, msg: Message):
 
     cm = ChatMgmt()
     group_lang = await cm.get_lang(msg.chat.id)
-    user_lang = msg.from_user.language_code
+    user_lang = to_iso639_1(msg.from_user.language_code)
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
     msg_lang = (await Detecter().detect(raw_text)).lower()
 
     # 确定目标翻译语言
     target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
+
     # 如果不需要翻译，直接返回
     if not target_lang or target_lang == msg_lang:
         logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 相同，不翻译")
         return None
+
     # 简繁不互相翻译
-    if "zh" in msg_lang and "zh" in target_lang:
+    if msg_lang == group_lang == "zh":
         logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 均为中文，不翻译")
         return None
 
