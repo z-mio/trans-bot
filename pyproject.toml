@@ -11,6 +11,7 @@ dependencies = [
     "googletrans>=4.0.2",
     "kurigram>=2.2.3",
     "langcodes>=3.5.0",
+    "lingua-language-detector>=2.1.1",
     "loguru>=0.7.3",
     "openai>=1.82.0",
     "python-dotenv>=1.1.0",
