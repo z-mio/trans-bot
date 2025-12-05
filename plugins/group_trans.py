@@ -42,7 +42,11 @@ async def enable_group_trans(cli: Client, msg: Message):
         await cm.set_trans_status(msg.chat.id, True)
         await cm.set_lang(msg.chat.id, lang)
         return await msg.reply(_t(f"已修改群组语言为: `{lang}`"))
-    return await msg.reply(_t(f"已启用翻译, 群组语言设置为: `{lang}`"))
+    return await msg.reply(
+        _t(
+            f"已启用翻译, 群组语言设置为: `{lang}`\n如需手动设置语言, 请使用 `/enable <语言代码>`"
+        )
+    )
 
 
 @Client.on_message(filters.group & filters.command("disable") & is_group_admin)
@@ -78,6 +82,11 @@ async def trans_group(_, msg: Message):
     target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
     # 如果不需要翻译，直接返回
     if not target_lang or target_lang == msg_lang:
+        logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 相同，不翻译")
+        return None
+    # 简繁不互相翻译
+    if "zh" in msg_lang and "zh" in target_lang:
+        logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 均为中文，不翻译")
         return None
 
     # 执行翻译
