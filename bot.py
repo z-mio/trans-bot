@@ -1,3 +1,4 @@
+import asyncio
 import sys
 
 from pyrogram import Client
@@ -15,6 +16,9 @@ else:
     logger.add("logs/bot.log", rotation="5 MB", level="INFO")
     logger.add(sys.stderr, level="INFO")
 
+setup_optimized_event_loop()
+loop = asyncio.new_event_loop()
+
 
 class Bot(Client):
     def __init__(self):
@@ -27,6 +31,7 @@ class Bot(Client):
             bot_token=self.cfg.bot_token,
             plugins=dict(root="plugins"),
             proxy=self.cfg.proxy.dict_format,
+            loop=loop,
         )
 
     async def start(self, **kwargs):
@@ -39,6 +44,5 @@ class Bot(Client):
 
 
 if __name__ == "__main__":
-    setup_optimized_event_loop()
     bot = Bot()
     bot.run()
