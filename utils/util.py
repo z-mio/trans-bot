@@ -20,6 +20,8 @@ async def get_group_lang(cli: Client, msg: Message) -> str | None:
 
 
 def to_iso639_1(locale: str):
+    if not locale:
+        return None
     return locale.split("-")[0].split("_")[0].lower()
 
 
