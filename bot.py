@@ -9,7 +9,7 @@ from core.config import bs, ws
 from core.watchdog import on_connect, on_disconnect
 from db.engine import close_db
 from db.init import init_db
-from i18n import ISO639_MAP, t_
+from i18n import SUPPORTED_LANGS, t_
 from log import logger, setup_logging
 from utils.event_loop import setup_optimized_event_loop
 
@@ -58,10 +58,10 @@ class Bot(Client):
 
     async def set_menu(self) -> None:
         """按语言设置命令菜单 (Bot API 支持多语言命令)."""
-        for iso639, bcp47 in ISO639_MAP.items():
-            commands = [BotCommand(command=k, description=v[bcp47]) for k, v in COMMANDS.items()]
-            await self.set_bot_commands(commands, language_code=iso639)
-            logger.debug(f"{iso639} 菜单已设置: {commands}")
+        for lang in SUPPORTED_LANGS:
+            commands = [BotCommand(command=k, description=v[lang]) for k, v in COMMANDS.items()]
+            await self.set_bot_commands(commands, language_code=lang)
+            logger.debug(f"{lang} 菜单已设置: {commands}")
             await asyncio.sleep(0.5)
 
 
