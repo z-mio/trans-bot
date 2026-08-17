@@ -2,13 +2,12 @@
 翻译器
 """
 
-import os
-
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
 
+from core.config import bs
 from translator.prompts import TRANSLATE_PROMPT
 
 from .base import BaseTranslator
@@ -16,24 +15,22 @@ from .error import TranslationError
 
 
 class OpenAITranslator(BaseTranslator):
-    """OpenAI 兼容接口翻译 (基于 pydantic-ai, Agent 内置重试)"""
+    """OpenAI 兼容接口翻译 (基于 pydantic-ai, Agent 内置重试).
+
+    api_key / base_url 统一从 BotSettings (OPENAI_API_KEY / OPENAI_BASE_URL) 读取.
+    """
 
     def __init__(
         self,
-        api_key: str | None = None,
-        base_url: str | None = None,
-        model: str = "gpt-4.1-nano",
+        model: str = "gpt-5-mini",
         prompt: str = TRANSLATE_PROMPT,
     ) -> None:
-        api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            raise ValueError("OPENAI_API_KEY 未配置")
         self.model = model
         self.prompt = prompt
         self._agent = Agent(
             model=OpenAIChatModel(
                 model,
-                provider=OpenAIProvider(api_key=api_key, base_url=base_url or os.getenv("OPENAI_BASE_URL")),
+                provider=OpenAIProvider(api_key=bs.openai_api_key, base_url=bs.openai_base_url),
             ),
             output_type=str,
             system_prompt=prompt,

@@ -12,17 +12,17 @@ Telegram 群组自动翻译机器人:添加到群组后,自动把外语消息翻
 
 ## 环境变量
 
-| 名称              | 默认值                                 | 描述                             |
-|-------------------|----------------------------------------|----------------------------------|
-| `API_ID`          |                                        | Telegram API ID(必填)            |
-| `API_HASH`        |                                        | Telegram API Hash(必填)          |
-| `BOT_TOKEN`       |                                        | Bot Token(必填)                  |
-| `BOT_PROXY`       |                                        | 代理 URL(兼容旧键名 `PROXY`)     |
-| `DEBUG`           | `false`                                | 调试模式(兼容旧键名 `BOT_DEBUG`) |
-| `DATABASE_URL`    | `sqlite+aiosqlite:///data/database.db` | 数据库连接 URL                   |
-| `TRANS_MODEL`     | `gpt-4o-mini`                          | openai 使用的模型                |
-| `OPENAI_API_KEY`  |                                        | openai API Key                   |
-| `OPENAI_BASE_URL` |                                        | openai API Base URL              |
+| 名称              | 默认值                                 | 描述                       |
+|-------------------|----------------------------------------|----------------------------|
+| `API_ID`          |                                        | Telegram API ID (必填)     |
+| `API_HASH`        |                                        | Telegram API Hash (必填)   |
+| `BOT_TOKEN`       |                                        | Bot Token (必填)           |
+| `BOT_PROXY`       |                                        | 代理 URL                   |
+| `DEBUG`           | `false`                                | 调试模式                   |
+| `DATABASE_URL`    | `sqlite+aiosqlite:///data/database.db` | 数据库连接 URL             |
+| `TRANS_MODEL`     | `gpt-5-mini`                           | openai 使用的模型          |
+| `OPENAI_API_KEY`  |                                        | openai API Key (必填)      |
+| `OPENAI_BASE_URL` |                                        | openai API Base URL (必填) |
 
 ## 运行
 

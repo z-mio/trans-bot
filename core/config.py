@@ -63,6 +63,10 @@ class BotSettings(BaseSettings):
 
     trans_model: str = Field(default="gpt-4o-mini")
     """OpenAI 翻译模型"""
+    openai_api_key: str = Field(min_length=1)
+    """OpenAI API Key (必填)"""
+    openai_base_url: str = Field(min_length=1)
+    """OpenAI API Base URL (必填)"""
 
     database_url: str = Field(default="sqlite+aiosqlite:///data/database.db")
     """数据库连接 URL"""
