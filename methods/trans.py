@@ -7,11 +7,13 @@ from utils.singleton import singleton
 class Trans:
     def __init__(self) -> None:
         self.provider = bs.trans_provider
+        # 翻译器无状态, 构造一次复用 (OpenAITranslator 会创建 pydantic-ai Agent)
+        self._translator = self._build_translator()
 
     async def translate(self, text: str, to_lang: str) -> str:
-        return await self._select_trans_provider().translate(text, to_lang)
+        return await self._translator.translate(text, to_lang)
 
-    def _select_trans_provider(self) -> BaseTranslator:
+    def _build_translator(self) -> BaseTranslator:
         match self.provider:
             case "google":
                 return GoogleTranslator()

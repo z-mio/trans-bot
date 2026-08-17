@@ -8,7 +8,7 @@ from i18n import t_
 from log import logger
 from methods import Trans
 from services import ChatService
-from translator import Detecter
+from translator import Detector
 from utils.filters import is_enable_trans, is_group_admin, trans_filter
 from utils.telegram import chat_id
 from utils.util import to_iso639_1
@@ -76,7 +76,7 @@ async def trans_group(_: Client, msg: Message) -> Message | None:
     user_lang = to_iso639_1(user.language_code)
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
-    msg_lang = await Detecter().detect(raw_text)
+    msg_lang = await Detector().detect(raw_text)
 
     # 确定目标翻译语言
     target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
@@ -125,7 +125,7 @@ async def _determine_target_language(
     if reply is not None:
         raw_text = reply.text or reply.caption
         if raw_text:
-            reply_lang = await Detecter().detect(raw_text)
+            reply_lang = await Detector().detect(raw_text)
             return _get_reply_target_language(user_lang, group_lang, msg_lang, reply_lang)
 
     # 处理非回复消息

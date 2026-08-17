@@ -61,21 +61,7 @@ class ChatService:
             return chat.language_code
         return None
 
-    async def set_lang(self, telegram_chat_id: int, lang: str) -> bool:
-        chat = await self.get(telegram_chat_id)
-        if not chat:
-            return False
-        chat.language_code = lang
-        return True
-
     async def trans_is_disable(self, telegram_chat_id: int) -> bool:
         if chat := await self.get(telegram_chat_id):
             return chat.disable
-        return True
-
-    async def set_trans_status(self, telegram_chat_id: int, status: bool) -> bool:
-        chat = await self.get(telegram_chat_id)
-        if not chat:
-            return False
-        chat.disable = not status
         return True

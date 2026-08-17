@@ -3,23 +3,12 @@ from pyrogram.enums import ChatMemberStatus, ChatType
 from pyrogram.filters import Filter
 from pyrogram.types import Message
 
-from core.config import bs
 from db import get_session
 from db.models import ChatType as DbChatType
 from log import logger
 from services import ChatService
 from utils.telegram import chat_id
 from utils.util import is_emoji_only, is_only_mentions, is_only_url, is_symbols_only
-
-
-async def _is_admin(flt: Filter, _: Client, msg: Message) -> bool:
-    user = msg.from_user
-    if user is None:
-        return False
-    return user.id in bs.admins
-
-
-is_admin = filters.create(_is_admin)
 
 
 async def _add_chat(flt: Filter, _: Client, msg: Message) -> bool:

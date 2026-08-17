@@ -1,7 +1,7 @@
 [project]
-name = "telegram-bot-template"
+name = "trans-bot"
 version = "0.1.0"
-description = "Add your description here"
+description = "Telegram 群组自动翻译机器人"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

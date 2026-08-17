@@ -1357,67 +1357,6 @@ asyncio = [
 ]
 
 [[package]]
-name = "telegram-bot-template"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "aiosqlite" },
-    { name = "alembic" },
-    { name = "easy-ai18n" },
-    { name = "emoji" },
-    { name = "googletrans" },
-    { name = "kurigram" },
-    { name = "langcodes" },
-    { name = "lingua-language-detector" },
-    { name = "loguru" },
-    { name = "pydantic" },
-    { name = "pydantic-ai-slim", extra = ["openai"] },
-    { name = "pydantic-settings" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "sqlalchemy", extra = ["asyncio"] },
-    { name = "tenacity" },
-    { name = "tgcrypto" },
-    { name = "uvloop", marker = "sys_platform != 'win32'" },
-    { name = "winloop", marker = "sys_platform == 'win32'" },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "easy-ai18n", extra = ["builder"] },
-    { name = "mypy" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "aiosqlite", specifier = ">=0.22.1" },
-    { name = "alembic", specifier = ">=1.18.5" },
-    { name = "easy-ai18n", specifier = ">=1.2.0" },
-    { name = "emoji", specifier = ">=2.14.1" },
-    { name = "googletrans", specifier = ">=4.0.2" },
-    { name = "kurigram", specifier = ">=2.2.3" },
-    { name = "langcodes", specifier = ">=3.5.0" },
-    { name = "lingua-language-detector", specifier = ">=2.1.1" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "pydantic", specifier = ">=2.12.3" },
-    { name = "pydantic-ai-slim", extras = ["openai"], specifier = ">=2.31.0" },
-    { name = "pydantic-settings", specifier = ">=2.11.0" },
-    { name = "python-dotenv", specifier = ">=1.2.2" },
-    { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.51,<2.1" },
-    { name = "tenacity", specifier = ">=9.1.2" },
-    { name = "tgcrypto", specifier = ">=1.2.5" },
-    { name = "uvloop", marker = "sys_platform != 'win32'", specifier = ">=0.22.1" },
-    { name = "winloop", marker = "sys_platform == 'win32'", specifier = ">=0.3.1" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "easy-ai18n", extras = ["builder"], specifier = ">=1.2.0" },
-    { name = "mypy", specifier = ">=2.1.0" },
-]
-
-[[package]]
 name = "tenacity"
 version = "9.1.4"
 source = { registry = "https://pypi.org/simple" }
@@ -1489,6 +1428,67 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/21/3b/6c24bec5be5e743ffd99576daa5cc077722fc7d5bbc00bd133fa0c698dc6/tqdm-4.70.0.tar.gz", hash = "sha256:55b0b0dbd97462d06ebee91e4dac24ed4d4702be82b24f07e6c1d27e08cea220", size = 795438, upload-time = "2026-07-27T11:33:15.271Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/1c/01bfd571a64e7f270e6bab5e33777debe0edc56759233ce84f27dec92d14/tqdm-4.70.0-py3-none-any.whl", hash = "sha256:7f585706bfddbdebf89daac705b2dfcc16890130727d3197ca62c732b4310953", size = 80184, upload-time = "2026-07-27T11:33:13.167Z" },
+]
+
+[[package]]
+name = "trans-bot"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "aiosqlite" },
+    { name = "alembic" },
+    { name = "easy-ai18n" },
+    { name = "emoji" },
+    { name = "googletrans" },
+    { name = "kurigram" },
+    { name = "langcodes" },
+    { name = "lingua-language-detector" },
+    { name = "loguru" },
+    { name = "pydantic" },
+    { name = "pydantic-ai-slim", extra = ["openai"] },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "sqlalchemy", extra = ["asyncio"] },
+    { name = "tenacity" },
+    { name = "tgcrypto" },
+    { name = "uvloop", marker = "sys_platform != 'win32'" },
+    { name = "winloop", marker = "sys_platform == 'win32'" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "easy-ai18n", extra = ["builder"] },
+    { name = "mypy" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "aiosqlite", specifier = ">=0.22.1" },
+    { name = "alembic", specifier = ">=1.18.5" },
+    { name = "easy-ai18n", specifier = ">=1.2.0" },
+    { name = "emoji", specifier = ">=2.14.1" },
+    { name = "googletrans", specifier = ">=4.0.2" },
+    { name = "kurigram", specifier = ">=2.2.3" },
+    { name = "langcodes", specifier = ">=3.5.0" },
+    { name = "lingua-language-detector", specifier = ">=2.1.1" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "pydantic", specifier = ">=2.12.3" },
+    { name = "pydantic-ai-slim", extras = ["openai"], specifier = ">=2.31.0" },
+    { name = "pydantic-settings", specifier = ">=2.11.0" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+    { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.51,<2.1" },
+    { name = "tenacity", specifier = ">=9.1.2" },
+    { name = "tgcrypto", specifier = ">=1.2.5" },
+    { name = "uvloop", marker = "sys_platform != 'win32'", specifier = ">=0.22.1" },
+    { name = "winloop", marker = "sys_platform == 'win32'", specifier = ">=0.3.1" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "easy-ai18n", extras = ["builder"], specifier = ">=1.2.0" },
+    { name = "mypy", specifier = ">=2.1.0" },
 ]
 
 [[package]]

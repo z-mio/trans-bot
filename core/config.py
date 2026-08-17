@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
-from pydantic import Field, field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import make_url
 
@@ -56,9 +56,10 @@ class BotSettings(BaseSettings):
     bot_token: str
     api_id: str
     api_hash: str
-    bot_proxy: dict | None = Field(default=None)
+    # 兼容历史键名: 旧 .env 用 PROXY / BOT_DEBUG, 新键名 BOT_PROXY / DEBUG 优先
+    bot_proxy: dict | None = Field(default=None, validation_alias=AliasChoices("BOT_PROXY", "PROXY"))
     bot_workdir: Path = Field(default=Path("sessions"))
-    debug: bool = Field(default=False)
+    debug: bool = Field(default=False, validation_alias=AliasChoices("DEBUG", "BOT_DEBUG"))
     admins: list[int] = Field(default_factory=list)
     """管理员用户 ID 列表, 逗号分隔"""
 

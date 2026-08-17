@@ -7,6 +7,9 @@ import emoji
 def to_iso639_1(locale: str | None) -> str | None:
     if not locale:
         return None
+    locale = locale.strip()
+    if not locale:
+        return None
     return locale.split("-")[0].split("_")[0].lower()
 
 
