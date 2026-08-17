@@ -2,3 +2,5 @@
 .venv
 sessions
 logs
+data
+__pycache__

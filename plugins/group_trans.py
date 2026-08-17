@@ -6,8 +6,7 @@ from db import get_session
 from db.models import ChatType
 from i18n import t_
 from log import logger
-from methods import Trans
-from services import ChatService
+from services import ChatService, Trans
 from translator import Detector
 from utils.filters import is_enable_trans, is_group_admin, trans_filter
 from utils.telegram import chat_id
@@ -71,38 +70,43 @@ async def trans_group(_: Client, msg: Message) -> Message | None:
         return None
     cid = chat_id(msg)
 
-    async with get_session() as session:
-        group_lang = await ChatService(session).get_lang(cid)
-    user_lang = to_iso639_1(user.language_code)
-    logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
-    # 检测消息语言
-    msg_lang = await Detector().detect(raw_text)
+    try:
+        async with get_session() as session:
+            group_lang = await ChatService(session).get_lang(cid)
+        user_lang = to_iso639_1(user.language_code)
+        logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
+        # 检测消息语言
+        msg_lang = await Detector().detect(raw_text)
 
-    # 确定目标翻译语言
-    target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
+        # 确定目标翻译语言
+        target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
 
-    # 如果不需要翻译，直接返回
-    if not target_lang or target_lang == msg_lang:
-        logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 相同，不翻译")
+        # 如果不需要翻译，直接返回
+        if not target_lang or target_lang == msg_lang:
+            logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 相同，不翻译")
+            return None
+
+        # 简繁不互相翻译
+        if msg_lang == group_lang == "zh":
+            logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 均为中文，不翻译")
+            return None
+
+        # 执行翻译
+        logger.debug(f"翻译到目标语言: {target_lang}")
+        translated = await Trans().translate(raw_text, target_lang)
+        if translated == raw_text:
+            logger.debug("翻译结果与原文相同, 不回复")
+            return None
+        text = (
+            f"<blockquote expandable>{translated}</blockquote>"
+            if len(translated) > 60 or translated.count("\n") > 3
+            else translated
+        )
+        return await msg.reply(text)
+    except Exception:
+        # 翻译链路任何一步失败: 记录完整上下文, 静默跳过, 不影响群聊
+        logger.exception(f"群组翻译失败 (chat={cid}, user={user.id}): {raw_text!r}")
         return None
-
-    # 简繁不互相翻译
-    if msg_lang == group_lang == "zh":
-        logger.debug(f"消息语言: {msg_lang} 与目标语言: {target_lang} 均为中文，不翻译")
-        return None
-
-    # 执行翻译
-    logger.debug(f"翻译到目标语言: {target_lang}")
-    translated = await Trans().translate(raw_text, target_lang)
-    if translated == raw_text:
-        logger.debug("翻译结果与原文相同, 不回复")
-        return None
-    text = (
-        f"<blockquote expandable>{translated}</blockquote>"
-        if len(translated) > 60 or translated.count("\n") > 3
-        else translated
-    )
-    return await msg.reply(text)
 
 
 async def _determine_target_language(

@@ -29,3 +29,6 @@ class ChatRepo:
         self._session.add(chat)
         await self._session.flush()
         return chat
+
+    async def rollback(self) -> None:
+        await self._session.rollback()

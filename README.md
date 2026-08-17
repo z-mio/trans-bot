@@ -38,6 +38,18 @@ uv run bot.py
 - `/enable <语言代码>` - 启用自动翻译并设置群组语言
 - `/disable` - 禁用自动翻译
 
+命令菜单按用户语言显示(zh / en / ja / ru)。
+
+## 开发
+
+```bash
+uv sync                       # 安装依赖 (含 dev)
+uv run pytest                 # 运行测试 (语言决策穷举 / 检测 / 数据库访问)
+uv run ruff check .           # 代码检查
+uv run mypy                   # 类型检查
+uv run python i18n.py         # 重新生成 i18n 翻译 (需要 OPENAI_API_KEY)
+```
+
 ## 部署 (Docker)
 
 ```bash

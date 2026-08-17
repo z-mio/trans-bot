@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models.chat import Chat, ChatType
@@ -46,7 +47,9 @@ class ChatService:
         title: str | None = None,
         language_code: str | None = None,
     ) -> Chat:
-        if not (chat := await self.get(telegram_chat_id)):
+        if chat := await self.get(telegram_chat_id):
+            return chat
+        try:
             return await self.add(
                 telegram_chat_id,
                 chat_type,
@@ -54,7 +57,12 @@ class ChatService:
                 title=title,
                 language_code=language_code,
             )
-        return chat
+        except IntegrityError:
+            # 并发插入撞唯一约束: 回滚后取回已有记录
+            await self.chat.rollback()
+            if chat := await self.get(telegram_chat_id):
+                return chat
+            raise
 
     async def get_lang(self, telegram_chat_id: int) -> str | None:
         if chat := await self.get(telegram_chat_id):

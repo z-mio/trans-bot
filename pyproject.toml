@@ -45,7 +45,14 @@ ignore = [
 dev = [
     "easy-ai18n[builder]>=1.2.0",
     "mypy>=2.1.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.25.0",
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["test"]
+pythonpath = ["."]
 
 [tool.mypy]
 python_version = "3.12"

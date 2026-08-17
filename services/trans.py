@@ -1,5 +1,5 @@
 from core.config import bs
-from translator import BaseTranslator, OpenAITranslator
+from translator import OpenAITranslator
 from utils.singleton import singleton
 
 
@@ -7,7 +7,7 @@ from utils.singleton import singleton
 class Trans:
     def __init__(self) -> None:
         # 翻译器无状态, 构造一次复用 (pydantic-ai Agent)
-        self._translator: BaseTranslator = OpenAITranslator(model=bs.trans_model)
+        self._translator = OpenAITranslator(model=bs.trans_model)
 
     async def translate(self, text: str, to_lang: str) -> str:
         return await self._translator.translate(text, to_lang)

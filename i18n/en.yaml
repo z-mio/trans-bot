@@ -7,3 +7,7 @@ a86450f95445: 'Translation enabled. Group language set to: `{lang}`
   To change the language, use `/enable <ISO 639-1 language code>`'
 d7daeb243075: 'Please specify the group language manually: `/enable <ISO 639-1 language code>`'
 fe85dbe97391: Invalid language code
+a3e3b88377c8: Start
+92e3a830ae9a: Help
+3d484e601093: Enable translation
+736e4a699994: Disable translation

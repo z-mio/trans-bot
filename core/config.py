@@ -61,7 +61,7 @@ class BotSettings(BaseSettings):
     bot_workdir: Path = Field(default=Path("sessions"))
     debug: bool = Field(default=False, validation_alias=AliasChoices("DEBUG", "BOT_DEBUG"))
 
-    trans_model: str = Field(default="gpt-4o-mini")
+    trans_model: str = Field(default="gpt-5-mini")
     """OpenAI 翻译模型"""
     openai_api_key: str = Field(min_length=1)
     """OpenAI API Key (必填)"""

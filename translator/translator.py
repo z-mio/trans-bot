@@ -10,11 +10,10 @@ from pydantic_ai.settings import ModelSettings
 from core.config import bs
 from translator.prompts import TRANSLATE_PROMPT
 
-from .base import BaseTranslator
 from .error import TranslationError
 
 
-class OpenAITranslator(BaseTranslator):
+class OpenAITranslator:
     """OpenAI 兼容接口翻译 (基于 pydantic-ai, Agent 内置重试).
 
     api_key / base_url 统一从 BotSettings (OPENAI_API_KEY / OPENAI_BASE_URL) 读取.
