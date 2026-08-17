@@ -7,7 +7,6 @@ from typing import Any
 from sqlalchemy import BigInteger, Boolean, DateTime, Enum, Integer, String, false, func
 from sqlalchemy.orm import Mapped, mapped_column
 
-from core.config import bs
 from db.base import Base
 
 
@@ -38,8 +37,8 @@ class Chat(Base):
     language_code: Mapped[str] = mapped_column(
         String(16),
         nullable=False,
-        default=bs.default_lang,
-        server_default=bs.default_lang,
+        default="zh",
+        server_default="zh",
     )
     disable: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=false())
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

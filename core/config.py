@@ -60,12 +60,7 @@ class BotSettings(BaseSettings):
     bot_proxy: dict | None = Field(default=None, validation_alias=AliasChoices("BOT_PROXY", "PROXY"))
     bot_workdir: Path = Field(default=Path("sessions"))
     debug: bool = Field(default=False, validation_alias=AliasChoices("DEBUG", "BOT_DEBUG"))
-    admins: list[int] = Field(default_factory=list)
-    """管理员用户 ID 列表, 逗号分隔"""
 
-    # trans-bot 特有配置
-    default_lang: str = Field(default="zh-hans")
-    """默认语言"""
     trans_model: str = Field(default="gpt-4o-mini")
     """OpenAI 翻译模型"""
 
@@ -79,15 +74,6 @@ class BotSettings(BaseSettings):
         url = make_url(self.database_url)
         if url.get_backend_name() == "sqlite" and url.database:
             Path(url.database).parent.mkdir(parents=True, exist_ok=True)
-
-    @field_validator("admins", mode="before")
-    @classmethod
-    def admins_config(cls, v: Any) -> list[int]:
-        if v is None or v == "":
-            return []
-        if isinstance(v, str):
-            v = [x.strip() for x in v.split(",") if x.strip()]
-        return [int(x) for x in v]
 
     @field_validator("bot_proxy", mode="before")
     @classmethod
