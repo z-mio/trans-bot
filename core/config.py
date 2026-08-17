@@ -66,8 +66,6 @@ class BotSettings(BaseSettings):
     # trans-bot 特有配置
     default_lang: str = Field(default="zh-hans")
     """默认语言"""
-    trans_provider: str = Field(default="google")
-    """翻译提供商: google / openai"""
     trans_model: str = Field(default="gpt-4o-mini")
     """OpenAI 翻译模型"""
 

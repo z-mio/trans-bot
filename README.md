@@ -8,7 +8,7 @@ Telegram 群组自动翻译机器人:添加到群组后,自动把外语消息翻
 - `/enable <语言代码>` 启用翻译并设置群组语言(如 `/enable en`、`/enable zh`)
 - `/disable` 禁用翻译
 - 翻译目标语言代码使用两位 ISO 639-1 格式(`zh` / `en` / `ja` / `ru`)
-- 翻译提供商:google(googletrans)或 openai(pydantic-ai)
+- 翻译提供商:openai(pydantic-ai)
 
 ## 环境变量
 
@@ -22,7 +22,6 @@ Telegram 群组自动翻译机器人:添加到群组后,自动把外语消息翻
 | `ADMINS`          |                                | 管理员用户 ID 列表,逗号分隔                      |
 | `DATABASE_URL`    | `sqlite+aiosqlite:///data/database.db` | 数据库连接 URL                        |
 | `DEFAULT_LANG`    | `zh-hans`                      | 默认语言                                     |
-| `TRANS_PROVIDER`  | `google`                       | 翻译提供商: `google` / `openai`              |
 | `TRANS_MODEL`     | `gpt-4o-mini`                  | openai 使用的模型                            |
 | `OPENAI_API_KEY`  |                                | openai API Key                          |
 | `OPENAI_BASE_URL` |                                | openai API Base URL                     |

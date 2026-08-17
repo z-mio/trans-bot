@@ -1,5 +1,5 @@
 from .base import BaseTranslator
 from .detector import Detector
-from .translator import GoogleTranslator, OpenAITranslator
+from .translator import OpenAITranslator
 
-__all__ = ["GoogleTranslator", "OpenAITranslator", "Detector", "BaseTranslator"]
+__all__ = ["OpenAITranslator", "Detector", "BaseTranslator"]
