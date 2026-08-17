@@ -1,7 +1,6 @@
 import asyncio
 
 from lingua import LanguageDetectorBuilder
-from tenacity import retry, stop_after_attempt, wait_fixed
 
 from translator.error import DetectionError
 from utils.singleton import singleton
@@ -18,7 +17,6 @@ class Detector:
     def __init__(self) -> None:
         self._detector = LanguageDetectorBuilder.from_all_languages().build()
 
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1.5))
     async def detect(self, text: str) -> str:
         try:
             result = await asyncio.to_thread(self._detector.detect_language_of, text)
