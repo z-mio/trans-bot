@@ -5,8 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "aiosqlite>=0.21.0",
-    "easy-ai18n>=1.0.2",
+    "aiosqlite>=0.22.1",
+    "alembic>=1.18.5",
+    "easy-ai18n>=1.2.0",
     "emoji>=2.14.1",
     "googletrans>=4.0.2",
     "kurigram>=2.2.3",
@@ -14,11 +15,47 @@ dependencies = [
     "lingua-language-detector>=2.1.1",
     "loguru>=0.7.3",
     "openai>=1.82.0",
-    "python-dotenv>=1.1.0",
+    "pydantic>=2.12.3",
+    "pydantic-settings>=2.11.0",
+    "python-dotenv>=1.2.2",
     "pyyaml>=6.0.2",
-    "sqlalchemy>=2.0.41",
+    "sqlalchemy[asyncio]>=2.0.51,<2.1",
     "tenacity>=9.1.2",
     "tgcrypto>=1.2.5",
     "uvloop>=0.22.1 ; sys_platform != 'win32'",
     "winloop>=0.3.1 ; sys_platform == 'win32'",
 ]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "B",
+    "C4",
+    "UP",
+]
+ignore = [
+    "B008",
+    "C901",
+]
+
+[dependency-groups]
+dev = [
+    "easy-ai18n[builder]>=1.2.0",
+    "mypy>=2.1.0",
+]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["./"]
+ignore_missing_imports = true
+warn_return_any = true
+warn_unused_ignores = true
+check_untyped_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true

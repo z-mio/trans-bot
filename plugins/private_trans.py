@@ -6,12 +6,13 @@ from translator import Detecter
 from utils.filters import trans_filter
 
 
-@Client.on_message(
-    filters.private & (filters.text | filters.caption) & ~filters.via_bot & trans_filter
-)
-async def trans(_, msg: Message):
-    to_lang = msg.from_user.language_code
+@Client.on_message(filters.private & (filters.text | filters.caption) & ~filters.via_bot & trans_filter)
+async def trans(_: Client, msg: Message) -> Message | None:
+    user = msg.from_user
     text = msg.text
+    if user is None or not text:
+        return None
+    to_lang = user.language_code
     from_lang = (await Detecter().detect(text)).lower()
     if from_lang == to_lang:
         return None

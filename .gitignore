@@ -1,4 +1,7 @@
-venv
+.venv
 logs
 .env
-*.session
+sessions
+data
+__pycache__
+.idea

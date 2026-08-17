@@ -1,25 +1,28 @@
-import emoji
-import unicodedata
 import re
-
+import unicodedata
 from collections import Counter
+
+import emoji
 from pyrogram import Client
 from pyrogram.types import Message
+
 from translator import Detecter
+from utils.telegram import chat_id
 
 
 async def get_group_lang(cli: Client, msg: Message) -> str | None:
-    msgs = await cli.get_messages(msg.chat.id, range(msg.id - 100, msg.id - 1))
-    text_list = [m.text for m in msgs if m.text]
-    lang_list = await Detecter().detect(text_list[:30])
+    msgs = await cli.get_messages(chat_id(msg), range(msg.id - 100, msg.id - 1))
+    if not msgs:
+        return None
+    text_list = [str(m.text) for m in msgs if m.text]
+    lang_list = await Detecter().detect_many(text_list[:30])
     if not lang_list:
         return None
     counter = Counter(lang_list).most_common(1)
-    group_lang = counter[0][0]
-    return group_lang
+    return counter[0][0]
 
 
-def to_iso639_1(locale: str):
+def to_iso639_1(locale: str | None) -> str | None:
     if not locale:
         return None
     return locale.split("-")[0].split("_")[0].lower()
@@ -63,12 +66,12 @@ URL_PATTERN = re.compile(
 )  # 路径和查询字符串
 
 
-def is_only_url(text):
+def is_only_url(text: str) -> bool:
     text = text.strip()
     return bool(URL_PATTERN.fullmatch(text))
 
 
-def is_symbols_only(text):
+def is_symbols_only(text: str) -> bool:
     """
     判断文本是否只包含符号（标点符号、特殊字符等）
 
@@ -86,17 +89,13 @@ def is_symbols_only(text):
     for char in text:
         category = unicodedata.category(char)
         # 如果不是标点符号 (P)、符号 (S) 或空白 (Z)，则不是纯符号
-        if not (
-            category.startswith("P")
-            or category.startswith("S")
-            or category.startswith("Z")
-        ):
+        if not (category.startswith("P") or category.startswith("S") or category.startswith("Z")):
             return False
 
     return True
 
 
-def is_only_mentions(text):
+def is_only_mentions(text: str) -> bool:
     """
     判断文本是否只包含@用户名
 

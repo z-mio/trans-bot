@@ -1,23 +1,9 @@
 from pyrogram import Client, filters
-from pyrogram.types import Message, BotCommand
+from pyrogram.types import Message
 
-from utils.filters import is_admin, add_chat
+from utils.filters import add_chat
 
 
 @Client.on_message(filters.command(["start", "help"]) & add_chat)
-async def start(_, msg: Message):
+async def start(_: Client, msg: Message) -> None:
     await msg.reply_text("呀哈喽!")
-
-
-@Client.on_message(filters.command("menu") & is_admin)
-async def set_menu(cli: Client, msg: Message):
-    commands = {
-        "start": "开始",
-        "help": "帮助",
-        "enable": "启用群内翻译",
-        "disable": "禁用群内翻译",
-    }
-    await cli.set_bot_commands(
-        [BotCommand(command=k, description=v) for k, v in commands.items()]
-    )
-    await msg.reply("👌")

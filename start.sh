@@ -12,7 +12,7 @@ build_image() {
 # 启动容器
 start_container() {
     echo "正在启动容器..."
-    docker run -d --restart=always --env-file .env -v $PWD/logs:/app/logs -v $PWD/data:/app/data --name $CONTAINER_NAME $CONTAINER_NAME
+    docker run -d --restart=on-failure:2 --env-file .env -v ./logs:/app/logs -v ./sessions:/app/sessions -v ./data:/app/data --name $CONTAINER_NAME $CONTAINER_NAME
     echo "容器启动成功！"
     show_logs
 }

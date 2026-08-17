@@ -3,15 +3,17 @@
 """
 
 import os
+from typing import cast
 
 from googletrans import Translator as Gt
 from openai import AsyncOpenAI
-
-from .error import TranslationError
-from .base import BaseTranslator
-from .utils import build_messages
-from translator.prompts import TRANSLATE_PROMPT
 from tenacity import retry, stop_after_attempt, wait_fixed
+
+from translator.prompts import TRANSLATE_PROMPT
+
+from .base import BaseTranslator
+from .error import TranslationError
+from .utils import build_messages
 
 
 class GoogleTranslator(BaseTranslator):
@@ -22,19 +24,19 @@ class GoogleTranslator(BaseTranslator):
         try:
             result = await Gt().translate(text, dest=target_lang)
         except Exception as e:
-            raise TranslationError(f"谷歌翻译错误: {e}")
+            raise TranslationError(f"谷歌翻译错误: {e}") from e
         else:
-            return result.text
+            return cast(str, result.text)
 
 
 class OpenAITranslator(BaseTranslator):
     def __init__(
         self,
-        api_key: str = None,
-        base_url: str = None,
+        api_key: str | None = None,
+        base_url: str | None = None,
         model: str = "gpt-4.1-nano",
         prompt: str = TRANSLATE_PROMPT,
-    ):
+    ) -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY 未配置")
@@ -51,12 +53,13 @@ class OpenAITranslator(BaseTranslator):
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
-                messages=build_messages(
-                    self.prompt, f"Translate the text to {target_lang}:\n{text}"
-                ),
+                messages=build_messages(self.prompt, f"Translate the text to {target_lang}:\n{text}"),
                 temperature=0,
             )
         except Exception as e:
-            raise TranslationError(f"OpenAI翻译错误: {e}")
+            raise TranslationError(f"OpenAI翻译错误: {e}") from e
         else:
-            return response.choices[0].message.content
+            content = response.choices[0].message.content
+            if content is None:
+                raise TranslationError("OpenAI 返回了空内容")
+            return content
