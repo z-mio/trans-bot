@@ -1,11 +1,14 @@
-from langcodes import standardize_tag
 from lingua import LanguageDetectorBuilder
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from translator.error import DetectionError
+from utils.singleton import singleton
 
 
+@singleton
 class Detecter:
+    """语言检测器 (单例: 检测器构建需加载全部语言模型, 成本高)."""
+
     def __init__(self) -> None:
         self._detector = LanguageDetectorBuilder.from_all_languages().build()
 
@@ -17,29 +20,4 @@ class Detecter:
             raise DetectionError(f"检测语言错误: {e}") from e
         if result is None:
             raise DetectionError(f"无法检测语言: {text!r}")
-        return LangMap.get(result.iso_code_639_1.name.lower())
-
-    async def detect_many(self, texts: list[str]) -> list[str]:
-        """批量检测, 逐条复用 detect (含重试与错误包装)."""
-        return [await self.detect(text) for text in texts]
-
-
-class LangMap:
-    map = {
-        "zh-CN": "zh-Hans",
-        "zh-TW": "zh-Hant",
-        "zh-HK": "zh-Hant",
-        "zh-MO": "zh-Hant",
-        "zh-SG": "zh-Hans",
-    }
-
-    @staticmethod
-    def get(lang: str) -> str:
-        return LangMap.map.get(standardize_tag(lang), lang)
-
-    @staticmethod
-    def get_reverse(lang: str) -> str:
-        for k, v in LangMap.map.items():
-            if v.lower() == lang.lower():
-                return k
-        return lang
+        return result.iso_code_639_1.name.lower()

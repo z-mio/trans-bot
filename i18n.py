@@ -4,7 +4,7 @@ from easy_ai18n.translators import LLMBulkTranslator
 
 load_dotenv()
 
-i18n = EasyAI18n("zh-hans", func_names=["t_", "_", "_t"])
+i18n = EasyAI18n("zh", func_names=["t_", "_", "_t"])
 t_ = i18n.i18n()
 
 if __name__ == "__main__":

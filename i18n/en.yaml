@@ -2,9 +2,8 @@
 467b2a3c8fb4: Language code `{lang}` is invalid
 5a1eeb54f44d: 'Group language changed to: `{lang}`'
 5aad46a0fb38: Translation disabled
-c0b72729b771: Automatically retrieving group language...
-d701c19c361d: Failed to automatically detect the group language. Please set the language
-  manually using `/enable <ISO 639-1 language code>`
-e732bd9cf175: 'Translation enabled. Group language set to: `{lang}`
+a86450f95445: 'Translation enabled. Group language set to: `{lang}`
 
-  If you want to set the language manually, use `/enable <ISO 639-1 language code>`'
+  To change the language, use `/enable <ISO 639-1 language code>`'
+d7daeb243075: 'Please specify the group language manually: `/enable <ISO 639-1 language code>`'
+fe85dbe97391: Invalid language code

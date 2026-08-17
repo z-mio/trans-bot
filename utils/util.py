@@ -1,25 +1,7 @@
 import re
 import unicodedata
-from collections import Counter
 
 import emoji
-from pyrogram import Client
-from pyrogram.types import Message
-
-from translator import Detecter
-from utils.telegram import chat_id
-
-
-async def get_group_lang(cli: Client, msg: Message) -> str | None:
-    msgs = await cli.get_messages(chat_id(msg), range(msg.id - 100, msg.id - 1))
-    if not msgs:
-        return None
-    text_list = [str(m.text) for m in msgs if m.text]
-    lang_list = await Detecter().detect_many(text_list[:30])
-    if not lang_list:
-        return None
-    counter = Counter(lang_list).most_common(1)
-    return counter[0][0]
 
 
 def to_iso639_1(locale: str | None) -> str | None:

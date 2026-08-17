@@ -4,6 +4,7 @@ from pyrogram.types import Message
 from methods import Trans
 from translator import Detecter
 from utils.filters import trans_filter
+from utils.util import to_iso639_1
 
 
 @Client.on_message(filters.private & (filters.text | filters.caption) & ~filters.via_bot & trans_filter)
@@ -12,7 +13,7 @@ async def trans(_: Client, msg: Message) -> Message | None:
     text = msg.text
     if user is None or not text:
         return None
-    to_lang = user.language_code
+    to_lang = to_iso639_1(user.language_code)
     from_lang = (await Detecter().detect(text)).lower()
     if from_lang == to_lang:
         return None

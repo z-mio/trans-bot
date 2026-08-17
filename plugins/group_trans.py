@@ -9,38 +9,33 @@ from log import logger
 from methods import Trans
 from services import ChatService
 from translator import Detecter
-from translator.detecter import LangMap
 from utils.filters import is_enable_trans, is_group_admin, trans_filter
 from utils.telegram import chat_id
-from utils.util import get_group_lang, to_iso639_1
+from utils.util import to_iso639_1
 
 
 @Client.on_message(filters.group & filters.command("enable") & is_group_admin)
-async def enable_group_trans(cli: Client, msg: Message) -> Message | None:
-    cid = chat_id(msg)
+async def enable_group_trans(_: Client, msg: Message) -> Message | None:
+    chat = msg.chat
+    if chat is None or chat.id is None:
+        return None
+    cid = chat.id
+    lang = msg.command[1] if msg.command and msg.command[1:] else None
     async with get_session() as session:
         service = ChatService(session)
-        _t = t_[await service.get_lang(cid)]
-        lang: str | None
-        if msg.command and msg.command[1:]:
-            lang = msg.command[1]
-            if not Language.get(lang).is_valid():
-                return await msg.reply(_t(f"语言代码 `{lang}` 无效"))
-        else:
-            await msg.reply(_t("自动获取群组语言中..."))
-            lang = await get_group_lang(cli, msg)
-            if not lang:
-                return await msg.reply(_t("自动获取群组语言失败, 请手动设置语言, `/enable <ISO 639-1 语言代码>`"))
+        existing = await service.get(cid)
+        _t = t_[existing.language_code if existing else "zh"]
+        if lang is None:
+            return await msg.reply(_t("请手动指定群组语言: `/enable <ISO 639-1 语言代码>`"))
+        if not Language.get(lang).is_valid():
+            return await msg.reply(_t(f"语言代码 `{lang}` 无效"))
         lang_639 = to_iso639_1(lang)
         if lang_639 is None:
             return await msg.reply(_t("语言代码无效"))
-        if await service.get(cid):
-            await service.set_trans_status(cid, True)
-            await service.set_lang(cid, lang_639)
+        if existing:
+            existing.disable = False
+            existing.language_code = lang_639
             return await msg.reply(_t(f"已修改群组语言为: `{lang_639}`"))
-        chat = msg.chat
-        if chat is None:
-            return None
         await service.add(
             cid,
             ChatType.from_pyrogram(chat.type),
@@ -49,7 +44,7 @@ async def enable_group_trans(cli: Client, msg: Message) -> Message | None:
             language_code=lang_639,
         )
         return await msg.reply(
-            _t(f"已启用翻译, 群组语言设置为: `{lang_639}`\n如需手动设置语言, 请使用 `/enable <ISO 639-1 语言代码>`")
+            _t(f"已启用翻译, 群组语言设置为: `{lang_639}`\n如需修改语言, 请使用 `/enable <ISO 639-1 语言代码>`")
         )
 
 
@@ -58,9 +53,10 @@ async def disable_group_trans(_: Client, msg: Message) -> Message | None:
     cid = chat_id(msg)
     async with get_session() as session:
         service = ChatService(session)
-        _t = t_[await service.get_lang(cid)]
-
-        if await service.set_trans_status(cid, False):
+        chat = await service.get(cid)
+        _t = t_[chat.language_code if chat else "zh"]
+        if chat:
+            chat.disable = True
             return await msg.reply(_t("已禁用翻译"))
         return await msg.reply(_t("翻译未启用"))
 
@@ -80,7 +76,7 @@ async def trans_group(_: Client, msg: Message) -> Message | None:
     user_lang = to_iso639_1(user.language_code)
     logger.debug(f"群组语言: {group_lang}, 用户语言: {user_lang}, 消息: {raw_text}")
     # 检测消息语言
-    msg_lang = (await Detecter().detect(raw_text)).lower()
+    msg_lang = await Detecter().detect(raw_text)
 
     # 确定目标翻译语言
     target_lang = await _determine_target_language(msg, user_lang, group_lang, msg_lang)
@@ -97,14 +93,15 @@ async def trans_group(_: Client, msg: Message) -> Message | None:
 
     # 执行翻译
     logger.debug(f"翻译到目标语言: {target_lang}")
-    translated = await Trans().translate(raw_text, LangMap.get_reverse(target_lang))
+    translated = await Trans().translate(raw_text, target_lang)
+    if translated == raw_text:
+        logger.debug("翻译结果与原文相同, 不回复")
+        return None
     text = (
         f"<blockquote expandable>{translated}</blockquote>"
         if len(translated) > 60 or translated.count("\n") > 3
         else translated
     )
-    if text == raw_text:
-        return None
     return await msg.reply(text)
 
 
@@ -128,7 +125,7 @@ async def _determine_target_language(
     if reply is not None:
         raw_text = reply.text or reply.caption
         if raw_text:
-            reply_lang = (await Detecter().detect(raw_text)).lower()
+            reply_lang = await Detecter().detect(raw_text)
             return _get_reply_target_language(user_lang, group_lang, msg_lang, reply_lang)
 
     # 处理非回复消息
@@ -160,14 +157,9 @@ def _get_reply_target_language(
 def _get_normal_target_language(user_lang: str | None, group_lang: str | None, msg_lang: str) -> str | None:
     """
     处理普通消息的目标语言逻辑
-    """
-    # 用户语言与群组语言相同
-    if user_lang == group_lang:
-        # 如果消息语言也是群组语言，不翻译
-        if msg_lang == group_lang:
-            return None
-        # 如果消息语言不是群组语言，翻译为群组语言
-        return group_lang
 
-    # 用户语言与群组语言不同，翻译为群组语言
+    用户语言、消息语言、群组语言三者相同 → 不翻译; 其余情况一律翻译为群组语言
+    """
+    if user_lang == msg_lang == group_lang:
+        return None
     return group_lang
