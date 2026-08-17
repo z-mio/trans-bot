@@ -1,7 +1,7 @@
+name: trans-bot
 services:
   bot:
     build: .
-    container_name: trans-bot
     volumes:
       - ./logs:/app/logs
       - ./sessions:/app/sessions
