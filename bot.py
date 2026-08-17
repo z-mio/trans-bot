@@ -43,7 +43,8 @@ class Bot(Client):
         await init_db()
         await super().start()
         logger.info("Bot开始运行...")
-        # await self.set_menu()
+        if not bs.debug:
+            await self.set_menu()
 
     async def stop(self, *args: Any, **kwargs: Any) -> None:
         ws.exit_flag = True
