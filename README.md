@@ -18,8 +18,6 @@ Telegram 群组自动翻译机器人:添加到群组后,自动把外语消息翻
 | `API_HASH`        |                                        | Telegram API Hash (必填)   |
 | `BOT_TOKEN`       |                                        | Bot Token (必填)           |
 | `BOT_PROXY`       |                                        | 代理 URL                   |
-| `DEBUG`           | `false`                                | 调试模式                   |
-| `DATABASE_URL`    | `sqlite+aiosqlite:///data/database.db` | 数据库连接 URL             |
 | `TRANS_MODEL`     | `gpt-5-mini`                           | openai 使用的模型          |
 | `OPENAI_API_KEY`  |                                        | openai API Key (必填)      |
 | `OPENAI_BASE_URL` |                                        | openai API Base URL (必填) |
