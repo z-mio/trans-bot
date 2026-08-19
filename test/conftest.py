@@ -3,8 +3,11 @@
 import os
 import tempfile
 
-# BotSettings 的 OPENAI_API_KEY / OPENAI_BASE_URL 是必填字段,
-# 测试环境不依赖真实凭据, 提供占位值即可 (测试不会发起真实请求).
+# BotSettings 的必填字段没有默认值, CI 环境不存在 .env,
+# 测试不依赖真实凭据, 提供占位值即可 (测试不会发起真实请求).
+os.environ.setdefault("BOT_TOKEN", "123456:test-token")
+os.environ.setdefault("API_ID", "12345")
+os.environ.setdefault("API_HASH", "test-hash")
 os.environ.setdefault("OPENAI_API_KEY", "test-key")
 os.environ.setdefault("OPENAI_BASE_URL", "https://test.local/v1")
 
