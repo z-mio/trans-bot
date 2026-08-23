@@ -3,7 +3,7 @@ from easy_ai18n.translators import LLMBulkTranslator
 
 from core.config import bs
 
-i18n = EasyAI18n("zh", func_names=["t_"])
+i18n = EasyAI18n("zh", func_names=["t_", "_t"])
 t_ = i18n.i18n()
 
 # 命令菜单支持的语言 (ISO 639-1, 与 i18n 文案语言一致)

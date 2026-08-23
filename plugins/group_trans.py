@@ -1,3 +1,6 @@
+import html
+import re
+
 from langcodes import Language
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -12,6 +15,19 @@ from utils.filters import is_enable_trans, is_group_admin, trans_filter
 from utils.telegram import chat_id
 from utils.util import to_iso639_1
 
+_CODE_SPAN_RE = re.compile(r"`([^`]*)`")
+
+
+def _fmt_reply(text: str) -> str:
+    """把 i18n 回复文案渲染为安全的 HTML.
+
+    Client 使用 HTML parse_mode: 先整体转义 (防止 `<ISO 639-1 ...>` 之类
+    的尖括号被当成标签导致 ENTITY_BOUNDS_INVALID), 再把文案里的
+    `` `...` `` 反引号代码段还原为 ``<code>...</code>``.
+    """
+    escaped = html.escape(text, quote=False)
+    return _CODE_SPAN_RE.sub(r"<code>\1</code>", escaped)
+
 
 @Client.on_message(filters.group & filters.command("enable") & is_group_admin)
 async def enable_group_trans(_: Client, msg: Message) -> Message | None:
@@ -25,16 +41,16 @@ async def enable_group_trans(_: Client, msg: Message) -> Message | None:
         existing = await service.get(cid)
         _t = t_[existing.language_code if existing else "zh"]
         if lang is None:
-            return await msg.reply(_t("请手动指定群组语言: `/enable <ISO 639-1 语言代码>`"))
+            return await msg.reply(_fmt_reply(_t("请手动指定群组语言: `/enable <ISO 639-1 语言代码>`")))
         if not Language.get(lang).is_valid():
-            return await msg.reply(_t(f"语言代码 `{lang}` 无效"))
+            return await msg.reply(_fmt_reply(_t(f"语言代码 `{lang}` 无效")))
         lang_639 = to_iso639_1(lang)
         if lang_639 is None:
-            return await msg.reply(_t("语言代码无效"))
+            return await msg.reply(_fmt_reply(_t("语言代码无效")))
         if existing:
             existing.disable = False
             existing.language_code = lang_639
-            return await msg.reply(_t(f"已修改群组语言为: `{lang_639}`"))
+            return await msg.reply(_fmt_reply(_t(f"已修改群组语言为: `{lang_639}`")))
         await service.add(
             cid,
             ChatType.from_pyrogram(chat.type),
@@ -43,7 +59,9 @@ async def enable_group_trans(_: Client, msg: Message) -> Message | None:
             language_code=lang_639,
         )
         return await msg.reply(
-            _t(f"已启用翻译, 群组语言设置为: `{lang_639}`\n如需修改语言, 请使用 `/enable <ISO 639-1 语言代码>`")
+            _fmt_reply(
+                _t(f"已启用翻译, 群组语言设置为: `{lang_639}`\n如需修改语言, 请使用 `/enable <ISO 639-1 语言代码>`")
+            )
         )
 
 
@@ -54,10 +72,10 @@ async def disable_group_trans(_: Client, msg: Message) -> Message | None:
         service = ChatService(session)
         chat = await service.get(cid)
         _t = t_[chat.language_code if chat else "zh"]
-        if chat:
+        if chat and not chat.disable:
             chat.disable = True
-            return await msg.reply(_t("已禁用翻译"))
-        return await msg.reply(_t("翻译未启用"))
+            return await msg.reply(_fmt_reply(_t("已禁用翻译")))
+        return await msg.reply(_fmt_reply(_t("翻译未启用")))
 
 
 @Client.on_message(filters.group & (filters.text | filters.caption) & ~filters.via_bot & trans_filter & is_enable_trans)
@@ -97,10 +115,12 @@ async def trans_group(_: Client, msg: Message) -> Message | None:
         if translated == raw_text:
             logger.debug("翻译结果与原文相同, 不回复")
             return None
+        # 译文按 HTML 转义后再发送, 防止译文中的 < > & 破坏实体或注入格式
+        safe = html.escape(translated, quote=False)
         text = (
-            f"<blockquote expandable>{translated}</blockquote>"
+            f"<blockquote expandable>{safe}</blockquote>"
             if len(translated) > 60 or translated.count("\n") > 3
-            else translated
+            else safe
         )
         return await msg.reply(text)
     except Exception:
