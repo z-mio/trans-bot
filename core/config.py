@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import make_url
 
@@ -38,6 +38,11 @@ class BotSettings(BaseSettings):
         url = make_url(self.database_url)
         if url.get_backend_name() == "sqlite" and url.database:
             Path(url.database).parent.mkdir(parents=True, exist_ok=True)
+
+    @field_validator("bot_proxy", mode="before")
+    @classmethod
+    def empty_proxy_to_none(cls, v: str | None = None) -> str | None:
+        return v or None
 
     @property
     def bot_session_name(self) -> str:
