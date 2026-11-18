@@ -1,22 +1,15 @@
 import asyncio
-from typing import Any
 
 from pyrogram import Client
-from pyrogram.handlers import ConnectHandler, DisconnectHandler
 from pyrogram.types import BotCommand
 
-from core.config import bs, ws
-from core.watchdog import on_connect, on_disconnect
+from core.config import bs
 from db.engine import close_db
 from db.init import init_db
 from i18n import SUPPORTED_LANGS, t_
 from log import logger, setup_logging
-from utils.event_loop import setup_optimized_event_loop
 
 setup_logging(debug=bs.debug)
-
-setup_optimized_event_loop()
-loop = asyncio.new_event_loop()
 
 COMMANDS = {
     "start": t_("开始"),
@@ -35,26 +28,21 @@ class Bot(Client):
             bot_token=bs.bot_token,
             plugins={"root": "plugins"},
             proxy=bs.bot_proxy,
-            loop=loop,
             workdir=bs.bot_workdir,
         )
 
-    async def start(self, **kwargs: Any) -> None:
-        self.init_watchdog()
+    async def start(self, *, use_qr: bool = False, except_ids: list[int] | None = None) -> Client:
         await init_db()
-        await super().start()
+        await super().start(use_qr=use_qr, except_ids=except_ids)
         logger.info("Bot开始运行...")
         if not bs.debug:
             await self.set_menu()
+        return self
 
-    async def stop(self, *args: Any, **kwargs: Any) -> None:
-        ws.exit_flag = True
-        await super().stop(*args, **kwargs)
+    async def stop(self, block: bool = True, clear_handlers: bool = True) -> Client:
+        await super().stop(block=block, clear_handlers=clear_handlers)
         await close_db()
-
-    def init_watchdog(self) -> None:
-        self.add_handler(ConnectHandler(on_connect))
-        self.add_handler(DisconnectHandler(on_disconnect))
+        return self
 
     async def set_menu(self) -> None:
         """按语言设置命令菜单 (Bot API 支持多语言命令)."""
